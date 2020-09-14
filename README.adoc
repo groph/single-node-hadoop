@@ -4,7 +4,7 @@ This image is done by following the instructions from the following site:
 
 https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
 
-The particular setup used is "Pseudo-Distributed Operation" on the previously mentiuned webpage.
+The particular setup used is "Pseudo-Distributed Operation" on the previously mentioned webpage.
 
 === Configuration
 
