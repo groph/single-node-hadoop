@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Starting SSH daemon.
+/etc/init.d/ssh start
+
+# Setting up username.
+username=$1
+if [[ -z "$1" ]]; then
+	username=hadoop
+fi
+
+echo "Running script as $username."
+
+# Checke first run.
+initialized_file=/home/$username/hadoop_initialized
+if [ ! -f "$initialized_file" ]; then
+	# Formatting file system.
+	sudo -i -u $username hdfs namenode -format
+fi
+
+# Starting node manager.
+sudo -i -u $username start-dfs.sh
+
+if [ ! -f "$initialized_file" ]; then
+	# Creating user directory.
+	sudo -i -u $username hdfs dfs -mkdir /user
+	sudo -i -u $username hdfs dfs -mkdir /user/$username
+	
+	# Everything initialized. Creating marker file.
+	mkdir -p $initialized_file
+fi
+
+# Starting resource manager.
+sudo -i -u $username start-yarn.sh
+
+# Subscribing to node manager exit.
+dfs_pid=$(ps -A -o pid,cmd|grep java | grep -v grep |head -n 1 | awk '{print $1}')
+
+echo "Startup finished."
+
+tail --pid=$dfs_pid -f /dev/null

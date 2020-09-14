@@ -1,0 +1,35 @@
+== Hadoop
+
+This image is done by following the instructions from the following site:
+
+https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
+
+The particular setup used is "Pseudo-Distributed Operation" on the previously mentiuned webpage.
+
+TODO: Keygen at start
+TODO: fomat and create at start
+
+
+=== Configuration
+
+==== Quick example
+
+docker run -d \
+    -p 9000:9000 \
+    -p 8088:8088 \
+    -p 9870:9870 \
+    -v hadoop:/var/hadoop
+    -v hadoop_logs:/var/loghadoop
+    --name hadoop hadoop:3.3.0
+
+==== Environment variables
+
+
+
+==== Volumes
+
+/etc/hadoop
+
+/var/hadoop/
+
+/var/log/hadoop
