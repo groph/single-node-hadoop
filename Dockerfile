@@ -8,13 +8,16 @@ EXPOSE $HDFS_PORT
 EXPOSE 9870
 EXPOSE 8088
 
-ADD https://downloads.apache.org/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz /usr/local
 COPY scripts/hadoop-startup /usr/sbin/
 
 RUN apt-get update && apt-get install -y ssh pdsh sudo \
-	#nano mc net-tools \
 	&& rm -rf /var/lib/apt/lists/*
 
+RUN wget -q https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+	&& tar -xzf hadoop-${HADOOP_VERSION}.tar.gz -C /usr/local/ \
+	&& rm hadoop-${HADOOP_VERSION}.tar.gz \
+	&& mv /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop
+	
 # Setting up hadoop user.
 RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 	&& mkdir /home/${HADOOP_USERNAME}/.ssh \
@@ -27,9 +30,8 @@ RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 	&& echo "export HADOOP_LOG_DIR=/var/log/hadoop" >> /home/${HADOOP_USERNAME}/.bashrc \
 	&& echo "export $PATHHADOOP_COMMON_HOME=/usr/local/hadoop" >> /home/${HADOOP_USERNAME}/.bashrc \
 	&& chown -R ${HADOOP_USERNAME}:${HADOOP_USERNAME} /home/${HADOOP_USERNAME}/ \
-# Creating Hadoop link without version information.
-	&& ln -s /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop \
-	&& chown -R ${HADOOP_USERNAME}:${HADOOP_USERNAME} /usr/local/hadoop-${HADOOP_VERSION} \
+# Changing owner of Hadoop directory.
+	&& chown -R ${HADOOP_USERNAME}:${HADOOP_USERNAME} /usr/local/hadoop \
 # Creating lins to /usr/bin.
 	&& ln -s /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop \
 	&& ln -s /usr/local/hadoop/bin/yarn /usr/bin/ \

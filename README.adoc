@@ -6,12 +6,12 @@ https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCl
 
 The particular setup used is "Pseudo-Distributed Operation" on the previously mentiuned webpage.
 
-TODO: Keygen at start
-
 === Configuration
 
 ==== Quick example
 
+[source,bash]
+----
 docker run -d \
 	-p 9000:9000 \
 	-p 8088:8088 \
@@ -19,6 +19,7 @@ docker run -d \
 	-v hadoop:/var/hadoop
 	-v hadoop_logs:/var/log/hadoop
 	--name hadoop hadoop:3.3.0
+----
 
 ==== Volumes
 
