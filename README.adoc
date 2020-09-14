@@ -7,29 +7,23 @@ https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCl
 The particular setup used is "Pseudo-Distributed Operation" on the previously mentiuned webpage.
 
 TODO: Keygen at start
-TODO: fomat and create at start
-
 
 === Configuration
 
 ==== Quick example
 
 docker run -d \
-    -p 9000:9000 \
-    -p 8088:8088 \
-    -p 9870:9870 \
-    -v hadoop:/var/hadoop
-    -v hadoop_logs:/var/loghadoop
-    --name hadoop hadoop:3.3.0
-
-==== Environment variables
-
-
+	-p 9000:9000 \
+	-p 8088:8088 \
+	-p 9870:9870 \
+	-v hadoop:/var/hadoop
+	-v hadoop_logs:/var/log/hadoop
+	--name hadoop hadoop:3.3.0
 
 ==== Volumes
 
-/etc/hadoop
+The data resists in the `/var/hadoop` directory. You can map that directory to externalize it.
 
-/var/hadoop/
+Similarly the `/var/log/hadoop` folder contains the log files.
 
-/var/log/hadoop
+The configuration files are located in the `/etc/hadoop` directory.

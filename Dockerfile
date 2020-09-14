@@ -1,6 +1,6 @@
 FROM adoptopenjdk:11.0.3_7-jre-hotspot
 
-ARG HADOOP_VERSION=3.3.0
+ARG HADOOP_VERSION="3.3.0"
 ARG HDFS_PORT=9000
 ARG HADOOP_USERNAME=hadoop
 
@@ -8,21 +8,16 @@ EXPOSE $HDFS_PORT
 EXPOSE 9870
 EXPOSE 8088
 
-ADD https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz /usr/local
+ADD https://downloads.apache.org/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz /usr/local
 COPY scripts/hadoop-startup /usr/sbin/
-
-WORKDIR /usr/local
 
 RUN apt-get update && apt-get install -y ssh pdsh sudo \
 	#nano mc net-tools \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Setting up hadoop user
+# Setting up hadoop user.
 RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 	&& mkdir /home/${HADOOP_USERNAME}/.ssh \
-	&& ssh-keygen -t ed25519 -C "hadoop" -f /home/${HADOOP_USERNAME}/.ssh/id_ed25519 -q -N "" \
-	&& cat /home/${HADOOP_USERNAME}/.ssh/id_ed25519.pub >> /home/${HADOOP_USERNAME}/.ssh/authorized_keys \
-	&& chmod 0600 /home/${HADOOP_USERNAME}/.ssh/authorized_keys \
 	&& echo "export JAVA_HOME=/opt/java/openjdk" >> /home/${HADOOP_USERNAME}/.bashrc \
 	&& echo "export HADOOP_CONF_DIR=/etc/hadoop" >> /home/${HADOOP_USERNAME}/.bashrc \
 	&& echo "export HADOOP_COMMON_HOME=/usr/local/hadoop" >> /home/${HADOOP_USERNAME}/.bashrc \
@@ -32,7 +27,10 @@ RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 	&& echo "export HADOOP_LOG_DIR=/var/log/hadoop" >> /home/${HADOOP_USERNAME}/.bashrc \
 	&& echo "export $PATHHADOOP_COMMON_HOME=/usr/local/hadoop" >> /home/${HADOOP_USERNAME}/.bashrc \
 	&& chown -R ${HADOOP_USERNAME}:${HADOOP_USERNAME} /home/${HADOOP_USERNAME}/ \
-# Creating lins to /usr/bin
+# Creating Hadoop link without version information.
+	&& ln -s /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop \
+	&& chown -R ${HADOOP_USERNAME}:${HADOOP_USERNAME} /usr/local/hadoop-${HADOOP_VERSION} \
+# Creating lins to /usr/bin.
 	&& ln -s /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop \
 	&& ln -s /usr/local/hadoop/bin/yarn /usr/bin/ \
 	&& ln -s /usr/local/hadoop/bin/test-container-executor /usr/bin/ \
@@ -64,7 +62,7 @@ RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 	&& ln -s /usr/local/hadoop/sbin/yarn-daemon.sh /usr/sbin/ \
 	&& ln -s /usr/local/hadoop/sbin/yarn-daemons.sh /usr/sbin/ \
 	&& chmod +x /usr/sbin/hadoop-startup \
-# Setting up pdsh
+# Setting up pdsh.
 	&& echo "ssh" > /etc/pdsh/rcmd_default \
 # Moving configuration files to /etc.
 	&& ln -s /usr/local/hadoop/etc/hadoop /etc/ \
@@ -89,7 +87,7 @@ RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 		<name>dfs.replication</name>\n\
 		<value>1</value>\n\
 	</property>\n" /etc/hadoop/hdfs-site.xml \
-# Configuring YARN on a Single Node
+# Configuring YARN on a Single Node.
 	&& sed -i "/^<\/configuration>.*/i \
 	<property>\n\
 		<name>mapreduce.framework.name</name>\n\
@@ -116,7 +114,7 @@ RUN useradd -m -s /bin/bash -U ${HADOOP_USERNAME} \
 	&& mkdir -p /var/hadoop \
 	&& chown -R ${HADOOP_USERNAME}:${HADOOP_USERNAME} /var/hadoop/ \
 	&& chmod g+s /var/hadoop/ \
-# Disabling IPv6
+# Disabling IPv6.
 	&&  echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf \
 	&&  echo "net.ipv6.conf.default.disable_ipv6=1" >> /etc/sysctl.conf
 
